@@ -2,58 +2,46 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\RegisterRequest;
+use App\Services\AuthService;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
-class AuthController extends Controller
+class AuthController extends ApiController
 {
-    public function register(Request $request)
+    public function __construct(private AuthService $authService)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
-        $user = \App\Models\User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-        ]);
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-        ]);
     }
 
-    public function login(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
+        $result = $this->authService->register($request->validated());
 
-        if (!auth()->attempt($request->only('email', 'password'))) {
-            return response()->json(['message' => 'Invalid login details'], 401);
+        return $this->sendResponse([
+            'access_token' => $result['access_token'],
+            'token_type' => 'Bearer',
+        ], 'Registrasi berhasil.');
+    }
+
+    public function login(LoginRequest $request)
+    {
+        $result = $this->authService->login($request->validated());
+
+        if (!$result) {
+            return $this->sendError('Email atau password salah.', null, Response::HTTP_UNAUTHORIZED);
         }
 
-        $user = \App\Models\User::where('email', $request->email)->firstOrFail();
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'access_token' => $token,
+        return $this->sendResponse([
+            'access_token' => $result['access_token'],
             'token_type' => 'Bearer',
-        ]);
+        ], 'Login berhasil.');
     }
 
     public function logout(Request $request)
     {
-        $request->user()->tokens()->delete();
+        $this->authService->logout($request->user());
 
-        return response()->json(['message' => 'Successfully logged out']);
+        return $this->sendResponse(null, 'Berhasil logout.');
     }
 }
