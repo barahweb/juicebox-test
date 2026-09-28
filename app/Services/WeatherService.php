@@ -17,11 +17,13 @@ class WeatherService
 
     public function refreshWeather(string $city = self::DEFAULT_CITY): array
     {
-        $response = Http::get('https://api.openweathermap.org/data/2.5/weather', [
-            'q' => $city,
-            'appid' => config('services.openweathermap.key'),
-            'units' => 'metric',
-        ]);
+        $response = Http::timeout(5)
+            ->retry(2, 200, throw: false)
+            ->get('https://api.openweathermap.org/data/2.5/weather', [
+                'q' => $city,
+                'appid' => config('services.openweathermap.key'),
+                'units' => 'metric',
+            ]);
 
         if ($response->status() === 404) {
             throw new WeatherException('Kota tidak ditemukan.', 404);

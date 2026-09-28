@@ -9,18 +9,32 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 class SendWelcomeEmailJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public int $tries = 3;
+
     public function __construct(public User $user)
     {
+    }
+
+    public function backoff(): array
+    {
+        return [10, 30, 60];
     }
 
     public function handle(): void
     {
         Mail::to($this->user->email)->send(new WelcomeEmail($this->user));
+    }
+
+    public function failed(Throwable $exception): void
+    {
+        Log::error("Gagal mengirim welcome email ke {$this->user->email} setelah {$this->tries}x percobaan: {$exception->getMessage()}");
     }
 }

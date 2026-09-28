@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Resources\PostResource;
 use App\Models\Entity\Post;
 use App\Models\Entity\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -10,7 +11,10 @@ class PostService
 {
     public function paginate(): LengthAwarePaginator
     {
-        return Post::with('user:id,name,email')->latest()->paginate(15);
+        return Post::with('user:id,name,email')
+            ->latest()
+            ->paginate(15)
+            ->through(fn (Post $post) => new PostResource($post));
     }
 
     public function find(Post $post): Post
