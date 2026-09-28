@@ -21,7 +21,7 @@ class AuthController extends ApiController
         return $this->sendResponse([
             'access_token' => $result['access_token'],
             'token_type' => 'Bearer',
-        ], 'Registrasi berhasil.');
+        ], 'Registrasi berhasil.', Response::HTTP_CREATED);
     }
 
     public function login(LoginRequest $request)
@@ -43,5 +43,10 @@ class AuthController extends ApiController
         $this->authService->logout($request->user());
 
         return $this->sendResponse(null, 'Berhasil logout.');
+    }
+
+    public function me(Request $request)
+    {
+        return $this->sendResponse($request->user(), 'Data user berhasil diambil.');
     }
 }
