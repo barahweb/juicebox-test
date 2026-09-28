@@ -14,8 +14,8 @@ it('bisa ambil data cuaca dari API eksternal (di-mock)', function () {
 
     Http::fake([
         'api.openweathermap.org/*' => Http::response([
-            'name' => 'Jakarta',
-            'sys' => ['country' => 'ID'],
+            'name' => 'Perth',
+            'sys' => ['country' => 'AU'],
             'main' => ['temp' => 28.5, 'feels_like' => 30.1, 'humidity' => 66],
             'weather' => [['description' => 'light rain']],
             'wind' => ['speed' => 3.09],
@@ -26,14 +26,14 @@ it('bisa ambil data cuaca dari API eksternal (di-mock)', function () {
 
     $response->assertOk()
         ->assertJson(['success' => true])
-        ->assertJsonPath('data.city', 'Jakarta')
-        ->assertJsonPath('data.country', 'ID')
+        ->assertJsonPath('data.city', 'Perth')
+        ->assertJsonPath('data.country', 'AU')
         ->assertJsonPath('data.temperature', 28.5)
         ->assertJsonPath('data.description', 'light rain');
 
     Http::assertSent(function ($request) {
         return str_contains($request->url(), 'api.openweathermap.org')
-            && $request['q'] === 'Jakarta';
+            && $request['q'] === 'Perth,AU';
     });
 });
 
@@ -92,9 +92,9 @@ it('balikin 502 kalau API cuaca eksternal gagal', function () {
 it('tidak manggil API eksternal kalau data sudah ada di cache', function () {
     Sanctum::actingAs(User::factory()->create());
 
-    Cache::put('weather.jakarta', [
-        'city' => 'Jakarta',
-        'country' => 'ID',
+    Cache::put('weather.perth,au', [
+        'city' => 'Perth',
+        'country' => 'AU',
         'temperature' => 99,
         'feels_like' => 99,
         'humidity' => 10,

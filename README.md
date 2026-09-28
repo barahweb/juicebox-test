@@ -47,6 +47,14 @@ php artisan queue:work      # processes queued jobs
 php artisan schedule:work   # triggers scheduled tasks (dev only, use a cron entry in production)
 ```
 
+To manually dispatch a welcome email for testing (without going through the registration flow), run:
+
+```bash
+php artisan email:send-welcome user@example.com
+```
+
+This queues the job for that user; `queue:work` still needs to be running for it to actually be processed and sent.
+
 ### Testing
 
 ```bash
@@ -72,7 +80,7 @@ Response shape: `{ "success": bool, "message": string, "data"/"errors": ... }`
 | | POST | `/posts` | ✅ | Create post (`title`, `content`) |
 | | PUT/PATCH | `/posts/{id}` | ✅ owner only | Update post |
 | | DELETE | `/posts/{id}` | ✅ owner only | Delete post |
-| **Weather** | GET | `/weather?city=` | ✅ | Current weather (defaults to Jakarta) |
+| **Weather** | GET | `/weather?city=` | ✅ | Current weather (defaults to Perth, Australia) |
 
 ### Using the Postman Collection
 
@@ -124,6 +132,14 @@ php artisan queue:work      # proses job yang ada di antrean
 php artisan schedule:work   # jalanin tugas terjadwal (khusus dev, pakai cron kalau production)
 ```
 
+Buat ngetes kirim welcome email secara manual (tanpa perlu daftar user beneran lewat endpoint register), jalanin:
+
+```bash
+php artisan email:send-welcome user@example.com
+```
+
+Ini bakal masukin job-nya ke antrean; `queue:work` tetap harus jalan biar job-nya beneran diproses dan email-nya terkirim.
+
 ### Testing
 
 ```bash
@@ -149,7 +165,7 @@ Bentuk response: `{ "success": bool, "message": string, "data"/"errors": ... }`
 | | POST | `/posts` | ✅ | Bikin post (`title`, `content`) |
 | | PUT/PATCH | `/posts/{id}` | ✅ cuma pemilik | Edit post |
 | | DELETE | `/posts/{id}` | ✅ cuma pemilik | Hapus post |
-| **Weather** | GET | `/weather?city=` | ✅ | Cuaca terkini (default Jakarta) |
+| **Weather** | GET | `/weather?city=` | ✅ | Cuaca terkini (default Perth, Australia) |
 
 ### Cara Pakai Postman Collection
 

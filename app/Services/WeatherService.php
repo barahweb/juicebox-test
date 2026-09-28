@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Http;
 
 class WeatherService
 {
-    public const DEFAULT_CITY = 'Jakarta';
+    public const DEFAULT_CITY = 'Perth,AU';
 
     public function getCurrentWeather(string $city = self::DEFAULT_CITY): array
     {
@@ -44,7 +44,7 @@ class WeatherService
             'updated_at' => now()->toIso8601String(),
         ];
 
-        Cache::put($this->cacheKey($city), $weather, now()->addHours(2));
+        Cache::put($this->cacheKey($city), $weather, now()->addMinutes(15));
 
         return $weather;
     }

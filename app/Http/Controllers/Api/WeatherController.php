@@ -17,7 +17,7 @@ class WeatherController extends ApiController
         $validated = $request->validated();
 
         try {
-            $weather = $this->weatherService->getCurrentWeather($validated['city'] ?? 'Jakarta');
+            $weather = $this->weatherService->getCurrentWeather($validated['city'] ?? WeatherService::DEFAULT_CITY);
         } catch (WeatherException $e) {
             return $this->sendError($e->getMessage(), null, $e->statusCode);
         }
