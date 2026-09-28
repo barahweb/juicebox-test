@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +20,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Factory::guessFactoryNamesUsing(function (string $modelName) {
+            $name = class_basename($modelName);
+
+            return 'Database\\Factories\\'.$name.'Factory';
+        });
     }
 }
