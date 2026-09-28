@@ -44,6 +44,6 @@ class PostController extends ApiController
 
         $this->postService->delete($post);
 
-        return $this->sendResponse(null, 'Post berhasil dihapus.');
+        return $this->sendResponse(null, 'Post ID ' . $post->id . ' berhasil dihapus.');
     }
 }
